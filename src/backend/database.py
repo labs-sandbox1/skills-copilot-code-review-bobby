@@ -8,6 +8,7 @@ from typing import Dict, Any, List, Optional
 # In-memory storage
 activities_collection: Dict[str, Dict[str, Any]] = {}
 teachers_collection: Dict[str, Dict[str, Any]] = {}
+announcements_collection: Dict[str, Dict[str, Any]] = {}
 
 # Methods
 
@@ -36,7 +37,7 @@ def verify_password(hashed_password: str, plain_password: str) -> bool:
 
 def init_database():
     """Initialize database if empty"""
-    global activities_collection, teachers_collection
+    global activities_collection, teachers_collection, announcements_collection
 
     # Initialize activities if empty
     if not activities_collection:
@@ -51,6 +52,11 @@ def init_database():
                 "display_name": teacher["display_name"],
                 "role": teacher["role"]
             }
+    
+    # Initialize announcements if empty
+    if not announcements_collection:
+        for announcement_id, details in initial_announcements.items():
+            announcements_collection[announcement_id] = details
 
 
 # Initial database if empty
@@ -209,3 +215,15 @@ initial_teachers = [
         "role": "admin"
     }
 ]
+
+# Initial announcements
+initial_announcements = {
+    "1": {
+        "id": "1",
+        "message": "Activity registration is open until the end of the month. Don't lose your spot!",
+        "start_date": "2026-02-01",  # Optional start date
+        "end_date": "2026-02-28",    # Required expiration date
+        "created_by": "principal",
+        "created_at": "2026-02-01T10:00:00"
+    }
+}
