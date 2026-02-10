@@ -1,15 +1,13 @@
 """
-MongoDB database configuration and setup for Mergington High School API
+In-memory database configuration and setup for Mergington High School API
 """
 
-from pymongo import MongoClient
 from argon2 import PasswordHasher, exceptions as argon2_exceptions
+from typing import Dict, Any, List, Optional
 
-# Connect to MongoDB
-client = MongoClient('mongodb://localhost:27017/')
-db = client['mergington_high']
-activities_collection = db['activities']
-teachers_collection = db['teachers']
+# In-memory storage
+activities_collection: Dict[str, Dict[str, Any]] = {}
+teachers_collection: Dict[str, Dict[str, Any]] = {}
 
 # Methods
 
@@ -38,17 +36,21 @@ def verify_password(hashed_password: str, plain_password: str) -> bool:
 
 def init_database():
     """Initialize database if empty"""
+    global activities_collection, teachers_collection
 
     # Initialize activities if empty
-    if activities_collection.count_documents({}) == 0:
+    if not activities_collection:
         for name, details in initial_activities.items():
-            activities_collection.insert_one({"_id": name, **details})
+            activities_collection[name] = details
 
     # Initialize teacher accounts if empty
-    if teachers_collection.count_documents({}) == 0:
+    if not teachers_collection:
         for teacher in initial_teachers:
-            teachers_collection.insert_one(
-                {"_id": teacher["username"], **teacher})
+            teachers_collection[teacher["username"]] = {
+                "password": teacher["password"],
+                "display_name": teacher["display_name"],
+                "role": teacher["role"]
+            }
 
 
 # Initial database if empty
